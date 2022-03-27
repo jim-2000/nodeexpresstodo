@@ -1,25 +1,93 @@
-const getAllTasks = (req, res) => {
-    res.send('all the tasks from the database');
+ // Task Controller 
+
+const Task  = require('../model/Task');
+//
+const getAllTasks = async (req, res) => {
+    try {
+        const data = await Task.find({});
+        console.warn(data.length);
+        res.status(200).json(data);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+     
+    res.end();
 }
 //
 
-const createNewTask = (req, res) => {
-    console.log(req.body);
-    // res.send('create new tasks from the database');
-    res.status(201).json(req.body);
+const createNewTask = async (req, res) => {
+    
+//
+try {
+    const task = await Task.create({
+        name : req.body.name,
+        description : req.body.description,
+        completed : req.body.completed,
+        date : Date.now(),
+        color : req.body.color,
+    });
+    res.status(200).json(task);
+} catch (error) {
+    res.status(500).json({message: error.message});
+}
+    //
+    res.end();
+   
 }
 //
-const singetTask = (req, res) => {
-    res.send('singel tasks from the database');
+const singetTask = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const task = await Task.findById(id);
+        if (!task) {
+           return  res.status(404).json({message : 'task not found '});
+        }      
+        
+        res.status(200).json(task);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+     res.end();
 }
 
 //
-const updateTask = (req, res) => {
-    res.send('update tasks from the database');
-}
+const updateTask = async (req, res) => {
+try {
+    const id = req.params.id;
+    const task = await Task.findByIdAndUpdate(id, {
+        name : req.body.name,
+        description : req.body.description,
+        completed : req.body.completed,
+        date : Date.now(),
+        color : req.body.color,
 
-const deleteTask = (req, res) => {
-    res.send('delete  tasks from the database');
+    } , {new : true});
+    if (!task) {
+        return  res.status(404).json({message : 'task not found '});
+     }      
+     
+     res.status(200).json(task);
+} catch (error) {
+    res.status(500).json({message: error.message});
+}
+    res.end();
+}
+//=========
+
+const deleteTask = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const task = await Task.findOneAndDelete({_id : id});
+         
+        if (!task) {
+            return  res.status(404).json({message : 'task not found '});
+         }      
+         
+         res.status(200).json({task :null, message : 'task deleted'});
+    } catch (error) {
+        res.json(error);
+    }
+    res.end();
 }
 
 //
