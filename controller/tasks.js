@@ -61,7 +61,7 @@ try {
         date : Date.now(),
         color : req.body.color,
 
-    } , {new : true});
+    } , {new : true,runValidators : true});
     if (!task) {
         return  res.status(404).json({message : 'task not found '});
      }      
